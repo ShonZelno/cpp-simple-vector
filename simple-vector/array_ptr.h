@@ -15,12 +15,25 @@ public:
 
     ArrayPtr(const ArrayPtr&) = delete;
 
+    ArrayPtr(ArrayPtr&& other) noexcept : raw_ptr_(other.raw_ptr_) {
+        other.raw_ptr_ = nullptr;
+    }
+
     ~ArrayPtr() {
         delete[] raw_ptr_;
         raw_ptr_ = nullptr;
     }
 
     ArrayPtr& operator=(const ArrayPtr&) = delete;
+
+    ArrayPtr& operator=(ArrayPtr&& other) noexcept {
+        if (this != &other) {
+            delete[] raw_ptr_;
+            raw_ptr_ = other.raw_ptr_;
+            other.raw_ptr_ = nullptr;
+        }
+        return *this;
+    }
 
     [[nodiscard]] Type* Release() noexcept {
         Type* ptr = raw_ptr_;
